@@ -1,0 +1,17 @@
+{
+  "name": "exquizitive",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Reveals and applies the client-side answer key on demand",
+  "packageManager": "bun@1.4.3",
+  "scripts": {
+    "build": "bun run scripts/Build.ts",
+    "verify": "bun run scripts/Verify.ts",
+    "check": "bun run scripts/Build.ts && bun run scripts/Verify.ts",
+    "release": "bun run scripts/Bump.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  }
+}

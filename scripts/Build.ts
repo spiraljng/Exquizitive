@@ -1,4 +1,4 @@
-const Repository = 'spiraljng/exquizitive';
+const Repository = 'spiraljng/Exquizitive';
 const ScriptName = 'Exquizitive';
 const OutputDir = 'dist';
 

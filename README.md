@@ -8,7 +8,7 @@ It is deliberately not fully automatic. I did this for 2 reasons: 1) I could not
 
 ## Install
 
-Get it on **[Greasy Fork](https://greasyfork.org/en/users/1655377-spiraljng)** or from the **[GitHub Releases Page](https://github.com/spiraljng/exquizitive/releases/latest)**.
+Get it on **[Greasy Fork](https://greasyfork.org/en/users/1655377-spiraljng)** or from the **[GitHub Releases Page](https://github.com/spiraljng/Exquizitive/releases/latest)**.
 
 ---
 

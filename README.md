@@ -1,6 +1,6 @@
 # Exquisitive
 
-Exquisitive is a userscript for retrieving and (semi-)automatically inputting answers on the [Norton Inquizitive platform](ncia.wwnorton.com).
+Exquisitive is a userscript for retrieving and (semi-)automatically inputting answers on the [Norton Inquizitive platform](https://ncia.wwnorton.com).
 
 The genius minds at Norton have made this easy for us to do by shipping the entire answer as a client-sided value -- no validation whatsoever.
 

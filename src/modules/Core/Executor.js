@@ -1,4 +1,4 @@
-import { NormalizeText } from './Bridge.js';
+import { IsTruthy, NormalizeText } from './Bridge.js';
 
 const HIGHLIGHT_CLASS = 'exquizitive-correct';
 const MARKED_CLASS = 'exquizitive-marked';
@@ -105,6 +105,14 @@ const HighlightSingle = (Plan, Question) => {
     document.querySelectorAll('.dragblank_label').forEach((Element) => {
       const LabelIndex = Number(Element.getAttribute('data-label-id') ?? Element.getAttribute('label-id'));
       if (Key.includes(String(LabelIndex))) Mark(Element, -1);
+    });
+  }
+
+  if (Type === 'imageclick') {
+    const Key = Array.isArray(Question.correct_answer) ? Question.correct_answer : [];
+    document.querySelectorAll('.imageclick_aria_button').forEach((Element) => {
+      const Index = Number(Element.getAttribute('data-choice-id'));
+      if (IsTruthy(Key[Index])) Mark(Element, -1);
     });
   }
 

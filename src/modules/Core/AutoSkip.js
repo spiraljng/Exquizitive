@@ -54,6 +54,17 @@ let StaleSince = 0;
 
 const HasVisibleDialog = () => Array.from(document.querySelectorAll('.ui-dialog')).some(IsVisible);
 
+const LayerVisible = () => {
+  const Layer = document.querySelector('.layer_holder');
+  return Boolean(Layer) && getComputedStyle(Layer).display !== 'none';
+};
+
+const ClearStaleInert = () => {
+  if (!LayerVisible() || HasVisibleDialog()) return;
+  const Holder = document.getElementById('outer_holder');
+  if (Holder?.hasAttribute('inert')) Holder.removeAttribute('inert');
+};
+
 const CleanStaleOverlay = () => {
   const Overlays = Array.from(document.querySelectorAll(OVERLAY_SELECTOR)).filter(IsVisible);
   if (Overlays.length === 0 || HasVisibleDialog()) {
@@ -76,6 +87,7 @@ export const StartAutoSkip = (IsEnabled, OnSkip) => {
       if (!IsVisible(Dialog)) Handled.delete(Dialog);
     }
     CleanStaleOverlay();
+    ClearStaleInert();
     if (!IsEnabled()) return;
     for (const Dialog of Visible) {
       if (Handled.has(Dialog)) continue;

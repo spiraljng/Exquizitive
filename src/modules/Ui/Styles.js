@@ -58,6 +58,22 @@ export const Styles = `
   background-color: #e7f1f1 !important;
 }
 
+.imageclick_aria_button.exquizitive-correct {
+  width: 80px !important;
+  height: 30px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: visible !important;
+  clip: auto !important;
+  clip-path: none !important;
+  border: 3px solid #186263 !important;
+  border-radius: 4px !important;
+  background-color: #e7f1f1 !important;
+  color: transparent !important;
+  opacity: 0.85;
+  z-index: 5;
+}
+
 .layer_holder_buttons {
   z-index: 300 !important;
 }

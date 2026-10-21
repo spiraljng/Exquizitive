@@ -46,4 +46,4 @@ Alternatively, you can use the `bun run release <version>` shorthand to bump the
 
 ### TODO
 
-- Add support for the following question types: imageclick, dragreplace, passageclick, external (???)
+- Add support for the following question types: dragreplace, passageclick, external (???)

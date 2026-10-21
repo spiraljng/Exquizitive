@@ -220,6 +220,25 @@ const ResolveOrdering = (Plan, Question) => {
   return Plan;
 };
 
+const ResolveImageClick = (Plan, Question) => {
+  const Choices = ChoiceList(Question.choices);
+  const Key = Array.isArray(Question.correct_answer) ? Question.correct_answer : [];
+
+  Plan.Answers = Choices.map((Choice, Index) => ({
+    Text: ChoiceText(Choice, Index),
+    Correct: IsTruthy(Key[Index]),
+    CategoryIndex: -1,
+  }));
+
+  Plan.Actions = Choices.map((Choice, Index) => (IsTruthy(Key[Index]) ? Index : -1))
+    .filter((Index) => Index >= 0)
+    .map((Index) => ({ Kind: 'click', Selector: `.imageclick_aria_button[data-choice-id="${Index}"]`, Delay: 250 }));
+
+  Plan.Supported = Plan.Actions.length > 0;
+  Plan.Note = 'Click the outlined regions';
+  return Plan;
+};
+
 const ResolveTextEntry = (Plan, Question) => {
   const Values = KeySlots(Question.correct_answer);
   Plan.Answers = Values.map((Value) => ({ Text: StripHtml(Value), Correct: true, CategoryIndex: -1 }));
@@ -233,6 +252,7 @@ const Resolvers = {
   multiselect: ResolveMultiSelect,
   dragdrop: ResolveDragDrop,
   dragblanks: ResolveDragBlanks,
+  imageclick: ResolveImageClick,
   matching: ResolveMatching,
   ordering: ResolveOrdering,
   shortanswer: ResolveTextEntry,

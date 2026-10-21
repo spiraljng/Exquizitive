@@ -34,7 +34,7 @@ export const ChoiceList = (Choices) => {
 export const ChoiceText = (Choice, Index) => {
   if (Choice == null) return `Choice ${Index}`;
   if (typeof Choice === 'string') return StripHtml(Choice);
-  const Raw = Choice.text ?? Choice.label ?? Choice.Value ?? '';
+  const Raw = Choice.text ?? Choice.label ?? Choice.key ?? Choice.Key ?? Choice.Value ?? '';
   const Clean = StripHtml(Raw);
   return Clean || `Choice ${Index}`;
 };

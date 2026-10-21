@@ -2,7 +2,7 @@ import { GetCurrentQuestion, GetQuestionKey } from '../Core/Bridge.js';
 import { StartAutoSkip } from '../Core/AutoSkip.js';
 import { ClearHighlight, ExecutePlan, HighlightPlan } from '../Core/Executor.js';
 import { ResolvePlan } from '../Core/Resolver.js';
-import { PANEL_ID, Styles } from './Styles.js';
+import { CategoryColor, PANEL_ID, Styles } from './Styles.js';
 
 const STORAGE_KEY = 'exquizitive-panel-v2';
 const ANCHOR_ID = 'activity_scoreboard';
@@ -77,7 +77,20 @@ const SetStatus = (Message, IsError = false) => {
   Target.classList.toggle('eqx-error', IsError);
 };
 
+const LayerVisible = () => {
+  const Layer = document.querySelector('.layer_holder');
+  if (!Layer) return false;
+  return getComputedStyle(Layer).display !== 'none';
+};
+
 const Place = (Panel) => {
+  const Holder = document.getElementById('main_activity_holder');
+  const HolderHidden = Holder && getComputedStyle(Holder).display === 'none';
+  if (HolderHidden || LayerVisible()) {
+    Panel.classList.add('eqx-hidden');
+    return;
+  }
+  Panel.classList.remove('eqx-hidden');
   const Anchor = document.getElementById(ANCHOR_ID);
   if (Anchor) {
     const After = document.getElementById(ANCHOR_AFTER);
@@ -93,6 +106,20 @@ const Place = (Panel) => {
   if (Panel.parentElement !== document.body) document.body.append(Panel);
 };
 
+const Fit = () => {
+  const Panel = PanelRef;
+  if (!Panel || !Panel.isConnected) return;
+  if (Panel.classList.contains('eqx-floating')) {
+    Panel.style.removeProperty('--eqx-available');
+    return;
+  }
+  const Top = Panel.getBoundingClientRect().top;
+  const Available = Math.max(190, Math.round(window.innerHeight - Top - 16));
+  if (Panel.dataset.eqxAvailable === String(Available)) return;
+  Panel.dataset.eqxAvailable = String(Available);
+  Panel.style.setProperty('--eqx-available', `${Available}px`);
+};
+
 const SetAutoSkip = (Value, Silent = false) => {
   State.AutoSkip = Value;
   const Button = El('autoskip');
@@ -104,35 +131,59 @@ const SetAutoSkip = (Value, Silent = false) => {
   if (!Silent) SetStatus(Value ? 'Feedback will be skipped.' : 'Feedback will be shown.');
 };
 
+const BuildRow = (Answer, CategoryIndex) => {
+  const Item = document.createElement('li');
+  if (CategoryIndex >= 0) {
+    Item.classList.add('eqx-cat-item');
+    Item.style.setProperty('--eqx-cat', CategoryColor(CategoryIndex));
+  }
+  const Mark = document.createElement('span');
+  Mark.className = 'eqx-mark';
+  Mark.textContent = '√';
+  const Text = document.createElement('span');
+  Text.textContent = Answer.Text;
+  Item.append(Mark, Text);
+  return Item;
+};
+
+const BuildGroup = (Label, CategoryIndex) => {
+  const Group = document.createElement('li');
+  Group.className = 'eqx-group';
+  Group.style.setProperty('--eqx-cat', CategoryColor(CategoryIndex));
+  Group.textContent = Label;
+  return Group;
+};
+
 const Render = () => {
   const Panel = PanelRef;
   const Plan = State.Plan;
   if (!Panel || !Plan) return;
 
-  El('meta').textContent = [State.Plan.TypeDescription, State.Plan.Reference].filter(Boolean).join(', question ');
+  El('meta').textContent = [Plan.TypeDescription, Plan.Reference].filter(Boolean).join(', question ');
   El('note').textContent = Plan.Note ?? '';
 
   const List = El('list');
   List.innerHTML = '';
-  const Key = Plan.Answers.filter((Answer) => Answer.Correct);
-  if (Key.length === 0) {
-    const Empty = document.createElement('li');
-    Empty.textContent = 'No answer key exposed for this question.';
-    List.append(Empty);
+
+  if ((Plan.MemberTargets ?? []).length > 0) {
+    Plan.Categories.forEach((Category, CategoryIndex) => {
+      const Items = Plan.Answers.filter((Answer) => Answer.CategoryIndex === CategoryIndex);
+      if (Items.length === 0) return;
+      List.append(BuildGroup(Category.Label, CategoryIndex));
+      Items.forEach((Answer) => List.append(BuildRow(Answer, CategoryIndex)));
+    });
+  } else {
+    const Key = Plan.Answers.filter((Answer) => Answer.Correct);
+    if (Key.length === 0) {
+      const Empty = document.createElement('li');
+      Empty.textContent = 'No answer key exposed for this question.';
+      List.append(Empty);
+    }
+    Key.forEach((Answer) => List.append(BuildRow(Answer, -1)));
   }
-  Key.forEach((Answer) => {
-    const Item = document.createElement('li');
-    const Mark = document.createElement('span');
-    Mark.className = 'eqx-mark';
-    Mark.textContent = '√';
-    const Text = document.createElement('span');
-    Text.textContent = Answer.Text;
-    Item.append(Mark, Text);
-    List.append(Item);
-  });
 
   El('answer').disabled = !Plan.Supported;
-  El('highlight').disabled = Key.length === 0;
+  El('highlight').disabled = Plan.Answers.length === 0;
   El('collapse').textContent = State.Collapsed ? '▸' : '▾';
   Panel.classList.toggle('eqx-collapsed', State.Collapsed);
 };
@@ -169,13 +220,19 @@ const ToggleHighlight = () => {
   }
   const Count = HighlightPlan(State.Plan, Question);
   State.Highlighted = Count > 0;
-  SetStatus(Count > 0 ? `Highlighted ${Count} element${Count === 1 ? '' : 's'}.` : 'Nothing to highlight on this type.');
+  if (Count === 0) {
+    SetStatus('Nothing to highlight on this type.');
+    return;
+  }
+  const Groups = (State.Plan.Categories ?? []).length;
+  SetStatus(Groups > 1 ? `Highlighted ${Groups} categories.` : `Highlighted ${Count} element${Count === 1 ? '' : 's'}.`);
 };
 
 const Refresh = () => {
   const Panel = PanelRef;
   if (!Panel) return;
   Place(Panel);
+  Fit();
   const Question = GetCurrentQuestion();
   const Key = GetQuestionKey(Question);
   if (Key === State.QuestionKey) return;
@@ -231,6 +288,7 @@ export const MountPanel = () => {
   );
 
   const Timer = setInterval(Refresh, REFRESH_MS);
+  window.addEventListener('resize', Fit, { signal });
 
   SetAutoSkip(State.AutoSkip, true);
   Refresh();

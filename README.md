@@ -43,3 +43,7 @@ Contriubtion to this repo is pretty self explanatory -- the only thing to take s
 The workflow action only really cares about the `"version"` attribute in the `package.json` file, so when releasing a new version you should update that value.
 
 Alternatively, you can use the `bun run release <version>` shorthand to bump the package.json, build, and verify all in one. Release workflow only executes on the main branch
+
+### TODO
+
+- Add support for the following question types: imageclick, dragreplace, passageclick, external (???)

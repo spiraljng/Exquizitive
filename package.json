@@ -1,9 +1,9 @@
 {
   "name": "exquizitive",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "private": true,
   "type": "module",
-  "description": "Reveals and applies the client-side answer key on demand",
+  "description": "UserScript for retrieving and (semi-)automatically inputting answers on Norton's Inquizitive platform",
   "packageManager": "bun@1.4.3",
   "scripts": {
     "build": "bun run scripts/Build.ts",
